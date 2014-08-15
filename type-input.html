@@ -1,0 +1,58 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+
+<polymer-element name="type-input" attributes="sentence">
+  <template>
+  	<span>{{sentence}}</span><br>
+  	<paper-input id="input" label="Type the sentence above..."></paper-input>
+  	<ul class="statistics">
+  		<li>Characters: <span id="chars">0</span> chars</li>
+  		<li>Speed: <span id="speed">0</span> char/sec</li>
+  		<li>Max Speed: <span id="max-speed">0</span> char/sec</li>
+  	</ul>
+  </template>
+  <script>
+  Polymer('type-input', {
+  	sentence: "No sentence",
+  	ready: function() {
+  		var input = this.$.input,
+  			chars = this.$.chars,
+  			speed = this.$.speed,
+  			timestamps = [],
+  			self = this;
+
+  		input.addEventListener('keyup', function(e) {
+  			var timestamp,
+  				timestampCompare;
+
+  			chars.innerText = input.inputValue.length;
+
+  			// Add timestamp
+  			timestamp = new Date().getTime();
+  			timestamps.push(timestamp);
+
+  			// Check if correct
+  			if(self.sentence === input.inputValue) {
+  				self.fire('done', {msg: self.sentence});
+  			}
+
+  			// Only save the last 3 chars
+  			//if(timestamps.length > 3) {
+  			//	timestamps.shift();
+  			//}
+  		});
+
+  		// Set timeout
+  		setInterval(function() {
+  			// Compare timestamps
+  			if(timestamps.length > 5) {
+  				var timestampCompare = timestamps[timestamps.length - 6];
+
+				speed.innerText = (5 / ((new Date().getTime() - timestampCompare) / 1000)).toFixed(1);
+  			}
+			
+  		}, 200);
+  	}
+  });
+  </script>
+</polymer-element>
